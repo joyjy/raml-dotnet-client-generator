@@ -5,16 +5,47 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+
+import org.apache.commons.lang.StringUtils;
 
 public class TemplateHelper {
+	
+	// common
+	public static final String TOKEN = "}}";
+	static final String NAMESPACE_TOKEN = "{{namespace}}";
+	static final String COMMENT_TOKEN = "{{comment}}";
+	// properties
+	static final String PROPERTIES_TOKEN = "{{properties}}";
+	static final String PROPERTIES_NEW_TOKEN = "{{new properties}}";
+	static final String TYPE_TOKEN = "{{type}}";
+	static final String NAME_TOKEN = "{{name}}";
+	// client
+	static final String CLENT_NAME_TOKEN = "{{clientName}}";
+	static final String BASE_URI_TOKEN = "{{baseUri}}";
+	// resource
+	static final String RESOURCE_NAME_TOKEN = "{{resourceName}}";
+	static final String ACTIONS_TOKEN = "{{actions}}";
+	static final String METHOD_TOKEN = "{{method}}";
+	// param
+	static final String PARAM_TOKEN = "{{paramName}}";
+	static final String PATH_TOKEN = "{{path}}";
+	static final String QUERYSTRINGS_TOKEN = "{{queryStrings}}";
+	static final String HEADERS_TOKEN = "{{headers#";
+	static final String CONTENT_TOKEN = "{{content#";
+	// result
+	static final String RESULT_TOKEN = "{{resultName}}";
+	
+	private static final String CLASSPATH = "/templates/dotnet/{}Template.cs";
 
-	public static String readAll(String classPathResource) {
+	/**
+	 * 获取
+	 * @param template
+	 * @return
+	 */
+	public static String read(String template) {
 		StringBuilder sb = new StringBuilder(512);
 	    try {
-	        Reader r = new InputStreamReader(resource(classPathResource), "UTF-8");
+	        Reader r = new InputStreamReader(resource(template), "UTF-8");
 	        int c = 0;
 	        while ((c = r.read()) != -1) {
 	            sb.append((char) c);
@@ -25,24 +56,20 @@ public class TemplateHelper {
 	    return sb.toString();
 	}
 	
+	/**
+	 * @param template
+	 * @return
+	 */
 	public static BufferedReader open(String classPathResource){
 		return new BufferedReader(new InputStreamReader(resource(classPathResource)));
 	}
 	
-	private static InputStream resource(String classPathResource){
-		return TemplateHelper.class.getResourceAsStream(classPathResource);
-	}
-
-	public static String queryString(Map<String, String> queryParams) {
-		if(queryParams.size() == 0){
-			return "\"\"";
-		}
-		
-		StringBuilder sb = new StringBuilder();
-		for(Entry<String, String> pair: queryParams.entrySet()){
-			sb.append("\"&").append(pair.getKey()).append("=\"+").append(pair.getValue()).append("+");
-		}
-		
-		return sb.replace(1, 1, "?").deleteCharAt(sb.length()-1).toString();
+	/**
+	 * 
+	 * @param template
+	 * @return
+	 */
+	private static InputStream resource(String template){
+		return TemplateHelper.class.getResourceAsStream(StringUtils.replace(CLASSPATH, "{}", template));
 	}
 }
